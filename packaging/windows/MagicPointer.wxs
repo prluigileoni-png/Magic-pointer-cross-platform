@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package
+    Name="Magic Pointer"
+    Manufacturer="Magic Pointer"
+    Version="$(var.ProductVersion)"
+    UpgradeCode="{B9C1D5A5-8C7A-4C5B-9B9A-0C4A5E6F7A81}">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of Magic Pointer is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <StandardDirectory Id="ProgramFiles6432Folder">
+      <Directory Id="INSTALLFOLDER" Name="Magic Pointer">
+        <Component Id="ApplicationFiles" Guid="*">
+          <File Id="MagicPointerExe" Source="$(var.BinDir)\magic-pointer.exe" KeyPath="yes" />
+          <File Id="StartMagicPointerCmd" Source="$(var.ScriptsDir)\start-magic-pointer.cmd" />
+          <File Id="StartMagicPointerPs1" Source="$(var.ScriptsDir)\Start-MagicPointer.ps1" />
+          <File Id="ConfigExample" Source="$(var.SourceDir)\config.example.json" />
+          <File Id="Readme" Source="$(var.SourceDir)\README.md" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+
+    <Feature Id="MainFeature" Title="Magic Pointer" Level="1">
+      <ComponentRef Id="ApplicationFiles" />
+    </Feature>
+  </Package>
+</Wix>
