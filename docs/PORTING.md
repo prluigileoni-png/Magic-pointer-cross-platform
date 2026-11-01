@@ -58,6 +58,14 @@ Provider keys are never committed. For production installers, replace the
 JSON key field with the OS credential store (Windows Credential Manager and
 macOS Keychain).
 
+## First launch
+
+The executable creates a default configuration on first start. If no API key
+is present, it runs a setup wizard asking for the key, provider, and model, then
+saves the result. The wizard can be explicitly rerun with `--setup`. The
+Windows x64 package includes `start-magic-pointer.cmd` and
+`Start-MagicPointer.ps1`; both launch the executable without elevation.
+
 ## Original source
 
 The attached Windhawk source remains the behavioral reference. It contains

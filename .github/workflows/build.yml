@@ -22,7 +22,17 @@ jobs:
         with:
           targets: ${{ matrix.target }}
       - run: cargo build --release --target ${{ matrix.target }}
+      - name: Package release
+        shell: bash
+        run: |
+          mkdir -p package
+          cp target/${{ matrix.target }}/release/magic-pointer* package/
+          cp config.example.json README.md package/
+          if [[ "${{ matrix.target }}" == *windows* ]]; then
+            cp scripts/Start-MagicPointer.ps1 scripts/start-magic-pointer.cmd package/
+          fi
+          tar -czf magic-pointer-${{ matrix.target }}.tar.gz -C package .
       - uses: actions/upload-artifact@v4
         with:
           name: magic-pointer-${{ matrix.target }}
-          path: target/${{ matrix.target }}/release/magic-pointer*
+          path: magic-pointer-${{ matrix.target }}.tar.gz

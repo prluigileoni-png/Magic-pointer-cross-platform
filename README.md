@@ -6,6 +6,18 @@ families through one portable executable and persists settings as JSON.
 
 ## Quick start
 
+Download the `magic-pointer-x86_64-pc-windows-msvc` artifact from the GitHub
+Actions workflow for Windows x64, extract it, and double-click
+`start-magic-pointer.cmd`. The first launch asks for the API key, provider, and
+model, then stores the completed configuration in the user config directory.
+To repeat the wizard, run:
+
+```powershell
+.\magic-pointer.exe --setup
+```
+
+For development, use:
+
 ```powershell
 cargo run --release
 ```
@@ -15,6 +27,10 @@ copy `config.example.json`). The prompt loop is usable immediately. Use
 `:capture <question>` to capture the primary display and send it to the
 selected vision-capable provider. Global hotkey activation, OCR, and the
 animated overlay still require native Windows/macOS adapters and permissions.
+
+The Windows launcher is intentionally a thin script beside the executable: it
+does not install services, modify the registry, or require administrator
+privileges.
 
 ## Targets
 
