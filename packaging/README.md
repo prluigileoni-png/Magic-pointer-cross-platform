@@ -42,10 +42,16 @@ platform-specific follow-up work:
 * macOS: Screen Recording and Accessibility usage descriptions in
   `Info.plist`, plus a hardened runtime entitlement for the signed app.
 
-The current release is `v0.1.0`
-([release page](https://github.com/prluigileoni-png/Magic-pointer-cross-platform/releases/tag/v0.1.0)).
+The current release is `v0.2.0`
+([release page](https://github.com/prluigileoni-png/Magic-pointer-cross-platform/releases/tag/v0.2.0)).
 Future `v*` tags use the same CI pipeline and publish the Windows MSI,
 Windows portable archives, and macOS ARM64 packages.
+
+The MSI keeps the stable UpgradeCode in `MagicPointer.wxs` and receives the
+semantic version from the release tag. `MajorUpgrade` blocks downgrades and
+replaces the previous installation in the same folder, including the Start
+Menu shortcut, while per-user configuration remains outside the install
+directory.
 
 ## Windows ARM64
 
