@@ -7,6 +7,12 @@ first-run wizard asks for the API key, provider, and model. The Settings page
 later allows these values and capture preferences to be changed without
 editing JSON manually.
 
+The model selector is populated dynamically from the selected provider after
+an API key is entered. Gemini, OpenAI, Anthropic, and NVIDIA use their
+respective model-list APIs. The UI shows loading, error, and no-model states;
+if a refresh fails, the last saved model remains available as a documented
+fallback instead of being erased.
+
 The CI workflow builds reproducible release binaries for all requested
 architectures. Windows installers should package the `.exe` together with
 `config.example.json`; the macOS release should be placed in a signed,

@@ -51,6 +51,13 @@ animated overlay remain separate native adapters. This is deliberate:
 silently claiming full Windhawk equivalence would lose security boundaries and
 produce a misleading build.
 
+Provider model discovery is implemented in the shared Rust provider layer.
+Gemini filters for models supporting `generateContent`; OpenAI and NVIDIA use
+OpenAI-compatible `/models` responses; Anthropic uses `/v1/models`. All
+requests use the configured timeout. The GUI preserves the saved model when
+discovery fails, so a transient network or authentication error cannot erase a
+working configuration.
+
 ## Configuration and secrets
 
 Configuration is stored in the platform configuration directory as JSON.
