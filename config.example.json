@@ -1,0 +1,12 @@
+{
+  "provider": "gemini",
+  "model": "gemini-2.5-flash",
+  "api_key": "",
+  "base_url": "",
+  "hotkey": "Ctrl+Shift+G",
+  "sensitivity": 5,
+  "fullscreen": true,
+  "ocr": true,
+  "timeout_seconds": 30,
+  "language": ""
+}
