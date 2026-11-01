@@ -72,8 +72,9 @@ jobs:
         shell: pwsh
         run: |
           $wix = Join-Path $env:USERPROFILE ".dotnet\tools\wix.exe"
+          $version = if ($env:GITHUB_REF -match '^refs/tags/v(.+)$') { $Matches[1] } else { "0.2.1" }
           & $wix build packaging/windows/MagicPointer.wxs `
-            -d ProductVersion=0.1.0 `
+            -d ProductVersion=$version `
             -d BinDir="$PWD\target\x86_64-pc-windows-msvc\release" `
             -d SourceDir="$PWD" `
             -d ScriptsDir="$PWD\scripts" `
