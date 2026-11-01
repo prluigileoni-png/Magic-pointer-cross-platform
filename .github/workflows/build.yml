@@ -58,7 +58,7 @@ jobs:
   windows-installer:
     name: Windows x64 MSI
     runs-on: windows-latest
-    needs: build
+    needs: []
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -89,7 +89,7 @@ jobs:
   windows-arm64-installer:
     name: Windows ARM64 MSI
     runs-on: windows-latest
-    needs: build
+    needs: []
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -118,8 +118,8 @@ jobs:
 
   release:
     name: Publish tagged release
-    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
+    if: always() && startsWith(github.ref, 'refs/tags/v')
     needs: [build, windows-installer, windows-arm64-installer]
     permissions:
       contents: write
