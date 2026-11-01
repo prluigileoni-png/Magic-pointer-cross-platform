@@ -1,17 +1,12 @@
-mod app;
+#![cfg_attr(target_os = "windows", windows_subsystem = "windows")]
+
 mod config;
+mod gui;
 mod platform;
 mod providers;
 
 use anyhow::Result;
-use app::MagicPointer;
 
 fn main() -> Result<()> {
-    let setup = std::env::args().skip(1).any(|arg| arg == "--setup");
-    let app = MagicPointer::load()?;
-    if setup {
-        app.setup()?;
-        return Ok(());
-    }
-    app.run()
+    gui::run()
 }

@@ -17,9 +17,8 @@ To repeat the wizard, run:
 ```
 
 For a normal Windows installation, download `MagicPointer-x86_64.msi` from the
-GitHub Release and run it. Then open **Start Menu -> Magic Pointer**. The
-shortcut opens the interactive first-run wizard, which asks for the API key,
-provider, and model. The MSI installs the executable and both launchers
+GitHub Release and run it. Then open **Start Menu -> Magic Pointer**. The shortcut opens the graphical
+first-run wizard, which asks for the API key, provider, and model. The MSI installs the executable and both launchers
 without storing credentials or requiring an administrator service. A tagged
 `v*` build publishes the same MSI and portable archives as a GitHub Release.
 

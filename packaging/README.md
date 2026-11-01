@@ -23,9 +23,8 @@ privileges at first run, or modify the user configuration. The first launch
 creates the configuration and asks for the API key/provider/model.
 
 The MSI also creates a **Magic Pointer** Start Menu shortcut. The shortcut
-launches the bundled CMD launcher so the first-run wizard has an interactive
-console for entering the API key; launching the executable directly is not
-required.
+launches the normal desktop window without a console. The first-run wizard is
+graphical and asks for the API key, provider, and model.
 
 The current executable is a provider/configuration host. Before shipping a
 desktop release, implement the native adapters in `src/platform.rs` and add
@@ -35,3 +34,17 @@ the corresponding permission declarations:
   and a tray/overlay host.
 * macOS: Screen Recording and Accessibility usage descriptions in
   `Info.plist`, plus a hardened runtime entitlement for the signed app.
+
+## Windows ARM64
+
+CI produces a native `aarch64-pc-windows-msvc` portable archive. The x64 MSI
+can also run on ARM64 Windows through Microsoft's x64 emulation, but the ARM64
+archive is the preferred native package. An ARM64 MSI is not produced by the
+current x64-only WiX definition.
+
+## macOS ARM64
+
+CI produces both a portable tarball and a `Magic Pointer.app` ZIP bundle for
+Apple Silicon. The bundle includes the screen-capture usage description. It is
+unsigned unless Apple signing credentials are configured in CI, so Gatekeeper
+may require explicit approval on first launch.
