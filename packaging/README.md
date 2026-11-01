@@ -1,4 +1,11 @@
-# Packaging
+# Packaging and installation
+
+For end users, the recommended path is the Windows x64 MSI from the
+[latest GitHub Release](https://github.com/prluigileoni-png/Magic-pointer-cross-platform/releases/latest).
+Install it, then launch **Magic Pointer** from the Start Menu. The graphical
+first-run wizard asks for the API key, provider, and model. The Settings page
+later allows these values and capture preferences to be changed without
+editing JSON manually.
 
 The CI workflow builds reproducible release binaries for all requested
 architectures. Windows installers should package the `.exe` together with
@@ -23,15 +30,33 @@ privileges at first run, or modify the user configuration. The first launch
 creates the configuration and asks for the API key/provider/model.
 
 The MSI also creates a **Magic Pointer** Start Menu shortcut. The shortcut
-launches the bundled CMD launcher so the first-run wizard has an interactive
-console for entering the API key; launching the executable directly is not
-required.
+launches the normal desktop window without a console. The first-run wizard is
+graphical and asks for the API key, provider, and model.
 
-The current executable is a provider/configuration host. Before shipping a
-desktop release, implement the native adapters in `src/platform.rs` and add
-the corresponding permission declarations:
+The current executable is a desktop provider/configuration host. The shared
+capture path is implemented, while the following native adapters remain
+platform-specific follow-up work:
 
 * Windows: requested execution level, Graphics Capture/UI Automation usage,
   and a tray/overlay host.
 * macOS: Screen Recording and Accessibility usage descriptions in
   `Info.plist`, plus a hardened runtime entitlement for the signed app.
+
+The current release is `v0.1.0`
+([release page](https://github.com/prluigileoni-png/Magic-pointer-cross-platform/releases/tag/v0.1.0)).
+Future `v*` tags use the same CI pipeline and publish the Windows MSI,
+Windows portable archives, and macOS ARM64 packages.
+
+## Windows ARM64
+
+CI produces a native `aarch64-pc-windows-msvc` portable archive. The x64 MSI
+can also run on ARM64 Windows through Microsoft's x64 emulation, but the ARM64
+archive is the preferred native package. An ARM64 MSI is not produced by the
+current x64-only WiX definition.
+
+## macOS ARM64
+
+CI produces both a portable tarball and a `Magic Pointer.app` ZIP bundle for
+Apple Silicon. The bundle includes the screen-capture usage description. It is
+unsigned unless Apple signing credentials are configured in CI, so Gatekeeper
+may require explicit approval on first launch.

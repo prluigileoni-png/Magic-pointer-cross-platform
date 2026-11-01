@@ -26,16 +26,32 @@ jobs:
         shell: bash
         run: |
           mkdir -p package
-          cp target/${{ matrix.target }}/release/magic-pointer* package/
+          cp target/${{ matrix.target }}/release/magic-pointer${{ matrix.os == 'windows-latest' && '.exe' || '' }} package/
           cp config.example.json README.md package/
           if [[ "${{ matrix.target }}" == *windows* ]]; then
             cp scripts/Start-MagicPointer.ps1 scripts/start-magic-pointer.cmd package/
           fi
+          if [[ "${{ matrix.target }}" == "aarch64-apple-darwin" ]]; then
+            mkdir -p "Magic Pointer.app/Contents/MacOS" "Magic Pointer.app/Contents/Resources"
+            cp target/${{ matrix.target }}/release/magic-pointer "Magic Pointer.app/Contents/MacOS/magic-pointer"
+            cp packaging/macos/Info.plist "Magic Pointer.app/Contents/Info.plist"
+            cp config.example.json README.md "Magic Pointer.app/Contents/Resources/"
+            chmod +x "Magic Pointer.app/Contents/MacOS/magic-pointer"
+            ditto -c -k --sequesterRsrc --keepParent "Magic Pointer.app" "magic-pointer-${{ matrix.target }}.app.zip"
+          fi
           tar -czf magic-pointer-${{ matrix.target }}.tar.gz -C package .
       - uses: actions/upload-artifact@v4
+        if: matrix.target != 'aarch64-apple-darwin'
         with:
           name: magic-pointer-${{ matrix.target }}
           path: magic-pointer-${{ matrix.target }}.tar.gz
+      - uses: actions/upload-artifact@v4
+        if: matrix.target == 'aarch64-apple-darwin'
+        with:
+          name: magic-pointer-${{ matrix.target }}
+          path: |
+            magic-pointer-${{ matrix.target }}.tar.gz
+            magic-pointer-${{ matrix.target }}.app.zip
 
   windows-installer:
     name: Windows x64 MSI

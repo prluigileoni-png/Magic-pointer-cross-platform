@@ -21,8 +21,7 @@
             Directory="ApplicationProgramsFolder"
             Name="Magic Pointer"
             Description="Start Magic Pointer"
-            Target="[SystemFolder]cmd.exe"
-            Arguments="/c &quot;[#StartMagicPointerCmd]&quot;"
+            Target="[INSTALLFOLDER]magic-pointer.exe"
             WorkingDirectory="INSTALLFOLDER" />
         </Component>
         <Component Id="DocumentationFiles" Guid="{9A0C2B64-7E2D-4F8B-ABCF-0D42C4B7D623}">

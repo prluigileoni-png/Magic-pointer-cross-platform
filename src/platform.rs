@@ -12,15 +12,3 @@ pub fn capture_screen() -> Result<Vec<u8>> {
     image.write_to(&mut output, ImageFormat::Png)?;
     Ok(output.into_inner())
 }
-
-pub fn run_platform_loop() -> Result<()> {
-    #[cfg(target_os = "windows")]
-    println!(
-        "Windows capture adapter enabled. Global hotkeys/overlay require the desktop adapter."
-    );
-    #[cfg(target_os = "macos")]
-    println!("macOS capture adapter enabled when Screen Recording permission is granted.");
-    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
-    println!("This build provides provider/configuration functionality only.");
-    Ok(())
-}

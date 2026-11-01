@@ -66,6 +66,15 @@ saves the result. The wizard can be explicitly rerun with `--setup`. The
 Windows x64 package includes `start-magic-pointer.cmd` and
 `Start-MagicPointer.ps1`; both launch the executable without elevation.
 
+## Native packages
+
+CI publishes a native Windows ARM64 portable archive and a macOS ARM64
+`Magic Pointer.app` ZIP in addition to the Windows x64 MSI and portable
+archive. The x64 MSI runs on ARM64 Windows using x64 emulation; the ARM64
+archive is preferred when a native binary is required. The macOS bundle is
+unsigned unless signing credentials are configured, and requires user approval
+plus Screen Recording permission on first launch.
+
 ## Original source
 
 The attached Windhawk source remains the behavioral reference. It contains
