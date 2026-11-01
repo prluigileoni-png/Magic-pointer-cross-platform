@@ -39,16 +39,18 @@ GitHub Release.
 
 Use the native `magic-pointer-aarch64-pc-windows-msvc.tar.gz` package from the
 release assets. The x64 MSI can run through Windows ARM64 x64 emulation, but
-the ARM64 archive is preferred for native execution. There is intentionally no
-ARM64 MSI in the current packaging pipeline.
+the ARM64 archive is preferred for native execution. Releases also include
+`MagicPointer-aarch64.msi`, a native ARM64 MSI with the same Start Menu
+shortcut and in-place upgrade behavior.
 
 ### macOS ARM64
 
 Download `magic-pointer-aarch64-apple-darwin.app.zip` for Apple Silicon, or the
 matching portable tarball. Unzip the app to Applications and open **Magic
-Pointer**. The CI app bundle is unsigned unless Apple signing credentials are
-configured, so macOS may require an explicit Gatekeeper approval. Grant Screen
-Recording permission when using screen capture.
+Pointer**. A DMG is also provided when available. The CI app bundle is
+unsigned unless Apple signing credentials are configured, so macOS may require
+an explicit Gatekeeper approval. Grant Screen Recording permission when using
+screen capture.
 
 For development, use:
 

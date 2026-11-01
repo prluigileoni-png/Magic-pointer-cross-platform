@@ -38,6 +38,7 @@ jobs:
             cp config.example.json README.md "Magic Pointer.app/Contents/Resources/"
             chmod +x "Magic Pointer.app/Contents/MacOS/magic-pointer"
             ditto -c -k --sequesterRsrc --keepParent "Magic Pointer.app" "magic-pointer-${{ matrix.target }}.app.zip"
+            hdiutil create -volname "Magic Pointer" -srcfolder "Magic Pointer.app" -ov -format UDZO "magic-pointer-${{ matrix.target }}.dmg"
           fi
           tar -czf magic-pointer-${{ matrix.target }}.tar.gz -C package .
       - uses: actions/upload-artifact@v4
@@ -52,6 +53,7 @@ jobs:
           path: |
             magic-pointer-${{ matrix.target }}.tar.gz
             magic-pointer-${{ matrix.target }}.app.zip
+            magic-pointer-${{ matrix.target }}.dmg
 
   windows-installer:
     name: Windows x64 MSI
@@ -84,11 +86,41 @@ jobs:
           name: magic-pointer-windows-x64-installer
           path: MagicPointer-x86_64.msi
 
+  windows-arm64-installer:
+    name: Windows ARM64 MSI
+    runs-on: windows-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-pc-windows-msvc
+      - name: Build Windows ARM64 binary
+        shell: pwsh
+        run: cargo build --release --target aarch64-pc-windows-msvc
+      - name: Install WiX v4 CLI
+        shell: pwsh
+        run: dotnet tool install --global wix --version 5.0.2
+      - name: Build ARM64 MSI
+        shell: pwsh
+        run: |
+          $wix = Join-Path $env:USERPROFILE ".dotnet\tools\wix.exe"
+          $version = if ($env:GITHUB_REF -match '^refs/tags/v(.+)$') { $Matches[1] } else { "0.2.1" }
+          & $wix build packaging/windows/MagicPointer-arm64.wxs -arch arm64 `
+            -d ProductVersion=$version `
+            -d BinDir="$PWD\target\aarch64-pc-windows-msvc\release" `
+            -d SourceDir="$PWD" -d ScriptsDir="$PWD\scripts" `
+            -o "$PWD\MagicPointer-aarch64.msi"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: magic-pointer-windows-arm64-installer
+          path: MagicPointer-aarch64.msi
+
   release:
     name: Publish tagged release
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
-    needs: [build, windows-installer]
+    needs: [build, windows-installer, windows-arm64-installer]
     permissions:
       contents: write
     steps:
