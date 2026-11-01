@@ -33,21 +33,36 @@ struct MagicPointerApp {
     show_settings: bool,
     dark_mode: bool,
     pending: Option<Receiver<Result<String, String>>>,
+    model_pending: Option<Receiver<Result<Vec<providers::ModelInfo>, String>>>,
+    models: Vec<providers::ModelInfo>,
+    model_status: String,
+    model_source: (Provider, String, String),
 }
 
 impl MagicPointerApp {
     fn load() -> Self {
         match Config::load() {
-            Ok(config) => Self {
-                setup_required: config.api_key.trim().is_empty(),
-                config,
-                question: String::new(),
-                answer: String::new(),
-                status: String::new(),
-                show_settings: false,
-                dark_mode: true,
-                pending: None,
-            },
+            Ok(config) => {
+                let source = (
+                    config.provider,
+                    config.api_key.clone(),
+                    config.base_url.clone(),
+                );
+                Self {
+                    setup_required: config.api_key.trim().is_empty(),
+                    config,
+                    question: String::new(),
+                    answer: String::new(),
+                    status: String::new(),
+                    show_settings: false,
+                    dark_mode: true,
+                    pending: None,
+                    model_pending: None,
+                    models: Vec::new(),
+                    model_status: String::new(),
+                    model_source: source,
+                }
+            }
             Err(error) => Self {
                 config: Config::default(),
                 question: String::new(),
@@ -57,7 +72,57 @@ impl MagicPointerApp {
                 show_settings: true,
                 dark_mode: true,
                 pending: None,
+                model_pending: None,
+                models: Vec::new(),
+                model_status: String::new(),
+                model_source: (Provider::default(), String::new(), String::new()),
             },
+        }
+    }
+
+    fn refresh_models(&mut self) {
+        self.model_source = (
+            self.config.provider,
+            self.config.api_key.clone(),
+            self.config.base_url.clone(),
+        );
+        if self.config.api_key.trim().is_empty() {
+            self.models.clear();
+            self.model_status = "Enter an API key to load available models.".into();
+            return;
+        }
+        let config = self.config.clone();
+        let (sender, receiver) = mpsc::channel();
+        thread::spawn(move || {
+            let result = providers::list_models(&config).map_err(|error| format!("{error:#}"));
+            let _ = sender.send(result);
+        });
+        self.model_pending = Some(receiver);
+        self.model_status = "Loading models…".into();
+    }
+
+    fn poll_models(&mut self, ctx: &egui::Context) {
+        if let Some(receiver) = &self.model_pending {
+            match receiver.try_recv() {
+                Ok(Ok(models)) => {
+                    self.models = models;
+                    self.model_status = if self.models.is_empty() {
+                        "No models available for this provider/API key.".into()
+                    } else {
+                        format!("{} models available.", self.models.len())
+                    };
+                    self.model_pending = None;
+                }
+                Ok(Err(error)) => {
+                    self.model_status = format!("Could not load models: {error}");
+                    self.model_pending = None;
+                }
+                Err(mpsc::TryRecvError::Disconnected) => {
+                    self.model_status = "Model loading stopped unexpectedly.".into();
+                    self.model_pending = None;
+                }
+                Err(mpsc::TryRecvError::Empty) => ctx.request_repaint(),
+            }
         }
     }
 
@@ -112,6 +177,12 @@ impl MagicPointerApp {
     }
 
     fn show_settings_fields(&mut self, ui: &mut egui::Ui) {
+        let source_changed = self.model_source.0 != self.config.provider
+            || self.model_source.1 != self.config.api_key
+            || self.model_source.2 != self.config.base_url;
+        if source_changed && self.model_pending.is_none() {
+            self.refresh_models();
+        }
         ui.horizontal(|ui| {
             ui.label("Provider");
             egui::ComboBox::from_id_salt("provider")
@@ -129,7 +200,36 @@ impl MagicPointerApp {
         });
         ui.horizontal(|ui| {
             ui.label("Model");
-            ui.text_edit_singleline(&mut self.config.model);
+            if self.models.is_empty() {
+                ui.add(
+                    egui::TextEdit::singleline(&mut self.config.model)
+                        .hint_text("Saved model fallback"),
+                );
+            } else {
+                egui::ComboBox::from_id_salt("model")
+                    .selected_text(&self.config.model)
+                    .show_ui(ui, |ui| {
+                        for model in &self.models {
+                            ui.selectable_value(
+                                &mut self.config.model,
+                                model.id.clone(),
+                                &model.label,
+                            );
+                        }
+                    });
+            }
+        });
+        ui.horizontal(|ui| {
+            if ui
+                .add_enabled(
+                    self.model_pending.is_none(),
+                    egui::Button::new("Refresh models"),
+                )
+                .clicked()
+            {
+                self.refresh_models();
+            }
+            ui.label(egui::RichText::new(&self.model_status).small());
         });
         ui.horizontal(|ui| {
             ui.label("API key");
@@ -175,6 +275,7 @@ impl eframe::App for MagicPointerApp {
                 Err(mpsc::TryRecvError::Empty) => ctx.request_repaint(),
             }
         }
+        self.poll_models(ctx);
 
         egui::TopBottomPanel::top("header").show(ctx, |ui| {
             ui.horizontal(|ui| {

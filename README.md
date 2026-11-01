@@ -25,6 +25,13 @@ The main window includes:
 * a sidebar with the main workspace and **Settings**;
 * editable provider, model, API key, timeout, language, and capture options.
 
+The provider and model controls are connected: after an API key is entered or
+the provider changes, Magic Pointer loads the models exposed by that
+provider's models endpoint and presents them in a drop-down. Loading and API
+errors are shown inline. If a refresh fails, the previously saved model is
+kept as an explicit fallback and is never silently cleared; use **Refresh
+models** after correcting the key or network connection.
+
 To repeat the wizard, use the app's Settings page or run:
 
 ```powershell
