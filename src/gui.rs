@@ -203,7 +203,7 @@ impl MagicPointerApp {
             if self.models.is_empty() {
                 ui.add(
                     egui::TextEdit::singleline(&mut self.config.model)
-                        .hint_text("Saved model fallback"),
+                        .hint_text("Unverified saved-model fallback"),
                 );
             } else {
                 egui::ComboBox::from_id_salt("model")
@@ -213,7 +213,15 @@ impl MagicPointerApp {
                             ui.selectable_value(
                                 &mut self.config.model,
                                 model.id.clone(),
-                                &model.label,
+                                format!(
+                                    "{}{}",
+                                    model.label,
+                                    if model.verified {
+                                        format!(" · verified · {}", model.capabilities)
+                                    } else {
+                                        " · access not verified".into()
+                                    }
+                                ),
                             );
                         }
                     });

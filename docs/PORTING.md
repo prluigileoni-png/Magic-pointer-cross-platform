@@ -58,6 +58,12 @@ requests use the configured timeout. The GUI preserves the saved model when
 discovery fails, so a transient network or authentication error cannot erase a
 working configuration.
 
+The model list is account-scoped rather than a static catalog. HTTP 401, 403,
+404, and rate-limit responses remain visible as refresh errors, and no model
+is added based on a presumed plan or frontier-model name. When an API does not
+expose entitlement metadata, the UI reports provider-verified availability
+without guessing the subscription.
+
 ## Configuration and secrets
 
 Configuration is stored in the platform configuration directory as JSON.
