@@ -1,4 +1,11 @@
-# Packaging
+# Packaging and installation
+
+For end users, the recommended path is the Windows x64 MSI from the
+[latest GitHub Release](https://github.com/prluigileoni-png/Magic-pointer-cross-platform/releases/latest).
+Install it, then launch **Magic Pointer** from the Start Menu. The graphical
+first-run wizard asks for the API key, provider, and model. The Settings page
+later allows these values and capture preferences to be changed without
+editing JSON manually.
 
 The CI workflow builds reproducible release binaries for all requested
 architectures. Windows installers should package the `.exe` together with
@@ -26,14 +33,19 @@ The MSI also creates a **Magic Pointer** Start Menu shortcut. The shortcut
 launches the normal desktop window without a console. The first-run wizard is
 graphical and asks for the API key, provider, and model.
 
-The current executable is a provider/configuration host. Before shipping a
-desktop release, implement the native adapters in `src/platform.rs` and add
-the corresponding permission declarations:
+The current executable is a desktop provider/configuration host. The shared
+capture path is implemented, while the following native adapters remain
+platform-specific follow-up work:
 
 * Windows: requested execution level, Graphics Capture/UI Automation usage,
   and a tray/overlay host.
 * macOS: Screen Recording and Accessibility usage descriptions in
   `Info.plist`, plus a hardened runtime entitlement for the signed app.
+
+The current release is `v0.1.0`
+([release page](https://github.com/prluigileoni-png/Magic-pointer-cross-platform/releases/tag/v0.1.0)).
+Future `v*` tags use the same CI pipeline and publish the Windows MSI,
+Windows portable archives, and macOS ARM64 packages.
 
 ## Windows ARM64
 
