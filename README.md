@@ -32,6 +32,13 @@ errors are shown inline. If a refresh fails, the previously saved model is
 kept as an explicit fallback and is never silently cleared; use **Refresh
 models** after correcting the key or network connection.
 
+The list is not a built-in catalog: every displayed model comes from the
+authenticated provider response. Models without the provider's text-input
+capability metadata are labeled as provider-verified with capabilities not
+detailed; entitlement is never inferred from a plan name. A saved model shown
+as an unverified fallback is clearly marked and is used only when discovery
+cannot confirm the account's current access.
+
 To repeat the wizard, use the app's Settings page or run:
 
 ```powershell

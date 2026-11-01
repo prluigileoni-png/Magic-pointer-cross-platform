@@ -10,6 +10,8 @@ use crate::config::{Config, Provider};
 pub struct ModelInfo {
     pub id: String,
     pub label: String,
+    pub capabilities: String,
+    pub verified: bool,
 }
 
 fn client(config: &Config) -> Result<Client> {
@@ -63,7 +65,8 @@ fn list_gemini_models(client: &Client, c: &Config) -> Result<Vec<ModelInfo>> {
         .get(url)
         .query(&[("key", c.api_key.as_str())])
         .send()?
-        .error_for_status()?
+        .error_for_status()
+        .context("Gemini model endpoint rejected the API key or account access")?
         .json()?;
     Ok(parse_gemini_models(&value))
 }
@@ -88,6 +91,8 @@ fn parse_gemini_models(value: &Value) -> Vec<ModelInfo> {
             Some(ModelInfo {
                 id: name.strip_prefix("models/").unwrap_or(&name).to_owned(),
                 label: model["displayName"].as_str().unwrap_or(&name).to_owned(),
+                capabilities: "generateContent".into(),
+                verified: true,
             })
         })
         .collect()
@@ -104,7 +109,8 @@ fn list_anthropic_models(client: &Client, c: &Config) -> Result<Vec<ModelInfo>> 
         .header("x-api-key", &c.api_key)
         .header("anthropic-version", "2023-06-01")
         .send()?
-        .error_for_status()?
+        .error_for_status()
+        .context("Anthropic model access could not be verified")?
         .json()?;
     Ok(parse_openai_style_models(&value))
 }
@@ -125,7 +131,8 @@ fn list_openai_compatible_models(
         .get(url)
         .header("Authorization", format!("Bearer {}", c.api_key))
         .send()?
-        .error_for_status()?
+        .error_for_status()
+        .context("model endpoint rejected the API key or account access")?
         .json()?;
     Ok(parse_openai_style_models(&value))
 }
@@ -137,12 +144,43 @@ fn parse_openai_style_models(value: &Value) -> Vec<ModelInfo> {
         .flatten()
         .filter_map(|model| {
             let id = model["id"].as_str()?.to_owned();
+            if !supports_prompt_input(model) {
+                return None;
+            }
             Some(ModelInfo {
                 label: id.clone(),
                 id,
+                capabilities: model_capabilities(model),
+                verified: true,
             })
         })
         .collect()
+}
+
+fn supports_prompt_input(model: &Value) -> bool {
+    let Some(modalities) = model["input_modalities"].as_array() else {
+        return true;
+    };
+    modalities
+        .iter()
+        .any(|value| value.as_str() == Some("text"))
+        || modalities
+            .iter()
+            .any(|value| value.as_str() == Some("image"))
+}
+
+fn model_capabilities(model: &Value) -> String {
+    model["input_modalities"]
+        .as_array()
+        .map(|values| {
+            values
+                .iter()
+                .filter_map(Value::as_str)
+                .collect::<Vec<_>>()
+                .join(", ")
+        })
+        .filter(|value| !value.is_empty())
+        .unwrap_or_else(|| "text (provider verified; capabilities not detailed)".into())
 }
 
 fn ask_gemini(client: &Client, c: &Config, prompt: &str, image: Option<&[u8]>) -> Result<String> {
@@ -266,11 +304,15 @@ mod tests {
             vec![
                 ModelInfo {
                     id: "model-a".into(),
-                    label: "model-a".into()
+                    label: "model-a".into(),
+                    capabilities: "text (provider verified; capabilities not detailed)".into(),
+                    verified: true,
                 },
                 ModelInfo {
                     id: "model-b".into(),
-                    label: "model-b".into()
+                    label: "model-b".into(),
+                    capabilities: "text (provider verified; capabilities not detailed)".into(),
+                    verified: true,
                 },
             ]
         );
@@ -286,7 +328,9 @@ mod tests {
             parse_gemini_models(&value),
             vec![ModelInfo {
                 id: "vision".into(),
-                label: "Vision".into()
+                label: "Vision".into(),
+                capabilities: "generateContent".into(),
+                verified: true,
             }]
         );
     }

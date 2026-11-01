@@ -13,6 +13,12 @@ respective model-list APIs. The UI shows loading, error, and no-model states;
 if a refresh fails, the last saved model remains available as a documented
 fallback instead of being erased.
 
+Only models returned by the authenticated official endpoint are displayed.
+Gemini entries must advertise `generateContent`; OpenAI-compatible entries
+with explicit input modalities must include text or image input. Where an API
+does not expose plan/entitlement metadata, the app reports provider-verified
+availability without guessing the user's subscription.
+
 The CI workflow builds reproducible release binaries for all requested
 architectures. Windows installers should package the `.exe` together with
 `config.example.json`; the macOS release should be placed in a signed,
