@@ -16,6 +16,12 @@ To repeat the wizard, run:
 .\magic-pointer.exe --setup
 ```
 
+For a normal Windows installation, download the
+`magic-pointer-windows-x64-installer` artifact and run
+`MagicPointer-x86_64.msi`. The MSI installs the executable and both launchers
+without storing credentials or requiring an administrator service. A tagged
+`v*` build publishes the same MSI and portable archives as a GitHub Release.
+
 For development, use:
 
 ```powershell

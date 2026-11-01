@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package
+    Name="Magic Pointer"
+    Manufacturer="Magic Pointer"
+    Version="$(var.ProductVersion)"
+    UpgradeCode="{B9C1D5A5-8C7A-4C5B-9B9A-0C4A5E6F7A81}">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of Magic Pointer is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <StandardDirectory Id="ProgramFiles6432Folder">
+      <Directory Id="INSTALLFOLDER" Name="Magic Pointer">
+        <Component Id="ApplicationBinary" Guid="{2D1A5F18-9E2E-48E7-9F2A-6F1F4D6A9E11}">
+          <File Id="MagicPointerExe" Source="$(var.BinDir)\magic-pointer.exe" KeyPath="yes" />
+        </Component>
+        <Component Id="LauncherFiles" Guid="{F0D8B8D7-5E6A-4E99-9D30-DFD8C0D4A8B2}">
+          <File Id="StartMagicPointerCmd" Source="$(var.ScriptsDir)\start-magic-pointer.cmd" />
+          <File Id="StartMagicPointerPs1" Source="$(var.ScriptsDir)\Start-MagicPointer.ps1" />
+        </Component>
+        <Component Id="DocumentationFiles" Guid="{9A0C2B64-7E2D-4F8B-ABCF-0D42C4B7D623}">
+          <File Id="ConfigExample" Source="$(var.SourceDir)\config.example.json" />
+          <File Id="Readme" Source="$(var.SourceDir)\README.md" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+
+    <Feature Id="MainFeature" Title="Magic Pointer" Level="1">
+      <ComponentRef Id="ApplicationBinary" />
+      <ComponentRef Id="LauncherFiles" />
+      <ComponentRef Id="DocumentationFiles" />
+    </Feature>
+  </Package>
+</Wix>
