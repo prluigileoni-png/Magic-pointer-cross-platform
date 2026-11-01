@@ -57,12 +57,13 @@ directory.
 
 CI produces a native `aarch64-pc-windows-msvc` portable archive. The x64 MSI
 can also run on ARM64 Windows through Microsoft's x64 emulation, but the ARM64
-archive is the preferred native package. An ARM64 MSI is not produced by the
-current x64-only WiX definition.
+archive is the preferred native package. CI also produces
+`MagicPointer-aarch64.msi`, which installs the native ARM64 GUI and Start Menu
+shortcut using the same upgrade family and release-tag versioning.
 
 ## macOS ARM64
 
 CI produces both a portable tarball and a `Magic Pointer.app` ZIP bundle for
-Apple Silicon. The bundle includes the screen-capture usage description. It is
-unsigned unless Apple signing credentials are configured in CI, so Gatekeeper
-may require explicit approval on first launch.
+Apple Silicon, plus a reproducible DMG. The bundle includes the screen-capture
+usage description. It is unsigned unless Apple signing credentials are
+configured in CI, so Gatekeeper may require explicit approval on first launch.
