@@ -22,6 +22,11 @@ The MSI does not store API keys, create a service, require administrator
 privileges at first run, or modify the user configuration. The first launch
 creates the configuration and asks for the API key/provider/model.
 
+The MSI also creates a **Magic Pointer** Start Menu shortcut. The shortcut
+launches the bundled CMD launcher so the first-run wizard has an interactive
+console for entering the API key; launching the executable directly is not
+required.
+
 The current executable is a provider/configuration host. Before shipping a
 desktop release, implement the native adapters in `src/platform.rs` and add
 the corresponding permission declarations:
